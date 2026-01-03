@@ -135,13 +135,10 @@ export default function Home() {
             className="w-full max-w-2xl mx-auto"
           >
             <div className="bg-white rounded-xl p-6 md:p-8 shadow-md border border-gray-100 text-center">
-              <h2 className="text-xl md:text-2xl font-bold text-text-primary mb-4">
+              <h2 className="text-xl md:text-2xl font-bold text-text-primary">
                 What could you do with an extra{" "}
                 <span className="text-brand-blue">{extraHours}</span> hours per week?
               </h2>
-              <p className="text-lg md:text-xl text-text-secondary font-medium">
-                Who could you become?
-              </p>
             </div>
           </motion.section>
         )}
