@@ -12,6 +12,7 @@ export default function Home() {
 
   const selectedRangeData = HOUR_RANGES.find((r) => r.id === selectedRange);
   const sufferingHours = selectedRangeData?.midpoint ?? 0;
+  const extraHours = sufferingHours; // Hours they could reclaim
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
@@ -125,12 +126,32 @@ export default function Home() {
           <WeekCalendar sufferingHours={sufferingHours} />
         )}
 
+        {/* Final Question - Only show after selection */}
+        {selectedRange && extraHours > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="w-full max-w-2xl mx-auto"
+          >
+            <div className="bg-white rounded-xl p-6 md:p-8 shadow-md border border-gray-100 text-center">
+              <h2 className="text-xl md:text-2xl font-bold text-text-primary mb-4">
+                What could you do with an extra{" "}
+                <span className="text-brand-blue">{extraHours}</span> hours per week?
+              </h2>
+              <p className="text-lg md:text-xl text-text-secondary font-medium">
+                Who could you become?
+              </p>
+            </div>
+          </motion.section>
+        )}
+
         {/* CTA Section */}
         {selectedRange && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
             className="w-full max-w-2xl mx-auto"
           >
             <div className="bg-brand-blue rounded-xl p-6 md:p-8 text-center shadow-lg">

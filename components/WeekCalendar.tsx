@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { DAYS_PER_WEEK, WAKING_HOURS_PER_WEEK } from "@/lib/formQuestions";
 import { HourBlock } from "./HourBlock";
@@ -17,7 +17,26 @@ interface WeekCalendarProps {
 export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [prevSufferingHours, setPrevSufferingHours] = useState(sufferingHours);
+  const [displayPercentage, setDisplayPercentage] = useState(0);
   const isFirstUpdate = useRef(true);
+  const motionValue = useMotionValue(0);
+
+  // Calculate percentage
+  const percentage = Math.round((sufferingHours / WAKING_HOURS_PER_WEEK) * 100);
+
+  // Animate percentage counter
+  useEffect(() => {
+    const unsubscribe = motionValue.on("change", (latest) => {
+      setDisplayPercentage(Math.round(latest));
+    });
+
+    animate(motionValue, percentage, {
+      duration: 1,
+      ease: "easeOut",
+    });
+
+    return () => unsubscribe();
+  }, [percentage, motionValue]);
 
   // Convert hours to blocks (each block = 4 hours)
   const sufferingBlocks = Math.round(sufferingHours / HOURS_PER_BLOCK);
@@ -27,6 +46,8 @@ export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
   useEffect(() => {
     if (isFirstUpdate.current) {
       isFirstUpdate.current = false;
+      motionValue.set(percentage);
+      setDisplayPercentage(percentage);
       return;
     }
     
@@ -39,7 +60,7 @@ export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
     }, 50);
     
     return () => clearTimeout(timeout);
-  }, [sufferingHours]);
+  }, [sufferingHours, percentage, motionValue]);
 
   // Calculate how suffering blocks are distributed across the week
   const blocksGrid = useMemo(() => {
@@ -123,7 +144,7 @@ export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
       </p>
 
       {/* Calendar Grid */}
-      <div className="bg-gray-50 rounded-xl p-4 md:p-6 border border-gray-200">
+      <div className="bg-gray-50 rounded-xl p-4 md:p-6 border border-gray-200 mb-4">
         <div className="grid grid-cols-7 gap-3 md:gap-4">
           {/* Day Headers */}
           {DAYS.map((day) => (
@@ -150,6 +171,23 @@ export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
           ))}
         </div>
       </div>
+
+      {/* Percentage Counter */}
+      <motion.div
+        key={sufferingHours}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-center"
+      >
+        <div className="inline-block bg-white rounded-xl px-6 py-4 shadow-md border border-gray-200">
+          <p className="text-xs text-text-muted mb-1">of your waking hours</p>
+          <div className="text-4xl md:text-5xl font-black text-suffering-dark">
+            {displayPercentage}%
+          </div>
+          <p className="text-xs text-text-muted mt-1">spent in a primal state</p>
+        </div>
+      </motion.div>
     </motion.section>
   );
 }
