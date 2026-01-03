@@ -16,6 +16,7 @@ interface WeekCalendarProps {
 
 export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [hasMounted, setHasMounted] = useState(false);
   const [prevSufferingHours, setPrevSufferingHours] = useState(sufferingHours);
   const [displayPercentage, setDisplayPercentage] = useState(0);
   const isFirstUpdate = useRef(true);
@@ -48,6 +49,7 @@ export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
       isFirstUpdate.current = false;
       motionValue.set(percentage);
       setDisplayPercentage(percentage);
+      setHasMounted(true);
       return;
     }
     
@@ -174,8 +176,7 @@ export function WeekCalendar({ sufferingHours }: WeekCalendarProps) {
 
       {/* Percentage Counter */}
       <motion.div
-        key={sufferingHours}
-        initial={{ opacity: 0, scale: 0.8 }}
+        initial={hasMounted ? false : { opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="text-center"
